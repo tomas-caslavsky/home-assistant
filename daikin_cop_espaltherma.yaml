@@ -1,0 +1,17 @@
+#sensor calcultion of COP on Daiking Altherma 
+#Heat Pump integration based on https://raomin.github.io/ESPAltherma/ via MQTT
+
+- platform: template
+  sensors:
+    number_tc:
+      unique_id: '0a7476cc-d6c1-40ba-8ae1-606518c3497f'
+      friendly_name: TC number
+      value_template: >-
+        {% if is_state_attr('sensor.none_althermasensors','Operation Mode', 'Heating')%} 
+        {{((state_attr('sensor.none_althermasensors','Flow sensor (l/min)')| float * 0.06 * 1.16 * (state_attr('sensor.none_althermasensors','Outlet Water Heat Exch. Temp. (R1T)') | float - state_attr('sensor.none_althermasensors','Inlet water temp.(R4T)')|float) )
+          /
+          (state_attr('sensor.none_althermasensors','INV primary current (A)') | float * 400
+          |float / 1000))
+          |round(2)
+          }}
+          {% else %} 0 {%endif%}
